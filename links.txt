@@ -1,0 +1,15 @@
+Federated Learning
+https://colab.research.google.com/drive/1236C2EQQeXOHGca29Smik3PQUiFR49oY?usp=sharing
+
+
+Uploads to be done:
+
+requirements.txt
+images folder
+if saved model is needed ==> upload federated_learning.pth
+if saved clienst needed ===> upload clients_data.pth
+
+
+
+Secure Federated Learning
+To Do:
