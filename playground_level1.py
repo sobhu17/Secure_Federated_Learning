@@ -66,7 +66,6 @@ def main(pretrained=False, batch_size=64, save_path="mnist_cnn.pth"):
         model.load_state_dict(torch.load(save_path, map_location=device))
         model.to(device)
         print("Loaded pre-trained model parameters.")
-        return model
     else:
         # Train the model
         model.to(device)
@@ -76,8 +75,8 @@ def main(pretrained=False, batch_size=64, save_path="mnist_cnn.pth"):
         print(f"Model parameters saved to {save_path}.")
 
     # Evaluate the model
-    accuracy = evaluate(model, test_loader, device)
-    return accuracy
+    evaluate(model, test_loader, device)
+    return model
 
 
 

@@ -2,6 +2,8 @@ import torch
 import numpy as np
 from torch.utils.data import DataLoader, TensorDataset
 from utilities.attackutils import detect_random_noise_injection, detect_model_poisoning, detect_targeted_model_poisoning, is_malicious
+
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 clients_data = torch.load("./secure_clients_data.pth")
 clients = clients_data["clients"]
 client = clients[0]
@@ -15,7 +17,8 @@ def get_noisy_parameters(parameters):
     return noisy_parameters
 
 noisy_parameters = get_noisy_parameters(parameters)
-print(detect_random_noise_injection(noisy_parameters, client.model))
+attack_detected = detect_random_noise_injection(noisy_parameters, client.model)
+print(f"Is attack detected? {attack_detected}")
 
 
 def get_poisoned_parameters(poison_factor=10, noise_level=0.1):
@@ -33,7 +36,8 @@ def get_poisoned_parameters(poison_factor=10, noise_level=0.1):
     return poisoned_parameters
 
 poisoned_parameters = get_poisoned_parameters()
-print(detect_model_poisoning(poisoned_parameters, client.model))
+attack_detected = detect_model_poisoning(poisoned_parameters, client.model)
+print(f"Is attack detected? {attack_detected}")
 
 
 def targeted_poisoning_attack(model, target_class, poison_factor=10, noise_level=0.1):
@@ -62,6 +66,13 @@ def targeted_poisoning_attack(model, target_class, poison_factor=10, noise_level
 
 poisoned_parameters = targeted_poisoning_attack(client.model, target_class=5)
 
+for key, value in parameters.items():
+    parameters[key] = value.to(device)
+
+for key, value in poisoned_parameters.items():
+    poisoned_parameters[key] = value.to(device)
+
+
 def detect_targeted_poisoning(poisoned_parameters, original_parameters, threshold=100):
     diff = 0
     for key in poisoned_parameters:
@@ -74,4 +85,3 @@ def detect_targeted_poisoning(poisoned_parameters, original_parameters, threshol
 # Detect if the poisoning attack has been applied successfully
 attack_detected = detect_targeted_poisoning(poisoned_parameters, parameters)
 print(f"Is attack detected? {attack_detected}")
-
